@@ -141,9 +141,9 @@ Tested the split path live: lowered `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET`
 
 Checked running the demo locally with and without docker successfully.
 
-Noticed the frontend used hardcoded `/api/...` paths everywhere — fine in dev (Vite proxies them to `localhost:8001`) but broken in production where no proxy exists.
+Noticed the frontend used hardcoded `/api/...` paths everywhere.
 
-- Prompt: `the frontend is hardcoding /api — walk me through deploying the backend to Render and tell me what env var the frontend needs on Vercel`
+- Prompt: `the frontend is hardcoding /api — walk me through deploying the backend to Render and frond end to Vercel`
 
 Fix: created `frontend/src/config.ts` that exports `API_BASE`, reading from `VITE_API_BASE_URL` at build time and falling back to `/api` for local dev. All four fetch call sites (`App.tsx`, `useTranscription.ts`, `useSummarization.ts`, `useExport.ts`) updated to use it.
 
