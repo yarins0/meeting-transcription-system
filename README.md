@@ -1,5 +1,7 @@
 # Meeting Transcription System
 
+[**Live demo**](https://meeting-transcription-system.vercel.app/)
+
 Upload an audio recording of a meeting and receive a full transcript, structured summary, participant list, decisions, and action items.
 
 ## Prerequisites
@@ -106,3 +108,12 @@ FFmpeg is baked into the image — no PATH configuration needed.
 - [x] Phase 3 — /summarize endpoint + Claude integration + ResultsView
 - [x] Phase 4 — /export endpoint + Word download (RTL support for Hebrew)
 - [x] Phase 5 — Hardening, edge cases, pytest suite (44 tests); PROCESS.md in progress
+
+## Author
+
+**Yarin Solomon** — Full Stack Developer
+
+- Email: [yarinso39@gmail.com](mailto:yarinso39@gmail.com)
+- GitHub: [github.com/yarins0](https://github.com/yarins0)
+- LinkedIn: [linkedin.com/in/yarin-solomon](https://www.linkedin.com/in/yarin-solomon/)
+- Portfolio: [yarin-lab](https://yarin-lab.vercel.app/)

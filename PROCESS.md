@@ -140,3 +140,21 @@ Tested the split path live: lowered `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET`
 # Deploy Phase
 
 Checked running the demo locally with and without docker successfully.
+
+Noticed the frontend used hardcoded `/api/...` paths everywhere — fine in dev (Vite proxies them to `localhost:8001`) but broken in production where no proxy exists.
+
+- Prompt: `the frontend is hardcoding /api — walk me through deploying the backend to Render and tell me what env var the frontend needs on Vercel`
+
+Fix: created `frontend/src/config.ts` that exports `API_BASE`, reading from `VITE_API_BASE_URL` at build time and falling back to `/api` for local dev. All four fetch call sites (`App.tsx`, `useTranscription.ts`, `useSummarization.ts`, `useExport.ts`) updated to use it.
+
+Also updated `backend/Dockerfile` CMD from exec-form with hardcoded `8001` to shell-form `${PORT:-8001}` so Render can inject its own `PORT` env var at runtime.
+
+**Render setup (backend):**
+- New Web Service → Docker, root directory: `backend`
+- Env vars: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `TRANSCRIPTION_PROVIDER=whisper_api`, `CORS_ORIGINS=<vercel-url>`
+
+**Vercel setup (frontend):**
+- New Project, root directory: `frontend`
+- Env var: `VITE_API_BASE_URL=<render-service-url>`
+
+Deploy order matters: Render first, then set its URL in Vercel before triggering the frontend build.
