@@ -1,4 +1,4 @@
-# Research Phase
+# Research Phase [5 min]
 
 At first the only tool in the tech-stack I had to research was OpenAI Whisper API and other transcription models that are also stable and provide Hebrew support (as I've found Whisper to provide).
 I encountered a wide variety of models but decided to stick with the recommended one while also planning on not using an interface for model calls, which will let the code be mainly model-agnostic.
@@ -9,7 +9,7 @@ After looking up Whisper specifically in the [OpenAI docs](https://developers.op
 
 ---
 
-# Planning Phase
+# Planning Phase [10 min]
 
 Prompt: `/arch-planner` — in this plan include Whisper API but use it as an interface in order to make other models accessible in the future (with the provided `assignment.pdf` added).
 This is the skill description: "Act as a senior software architect to help users design, plan, and validate software systems. Use this skill whenever a user wants to brainstorm a new project, get tech stack recommendations, break a system into components, generate an implementation plan, think through edge cases and failure modes, or stress-test a plan against engineering principles (YAGNI, SOLID, DRY, KISS)".
@@ -28,7 +28,7 @@ Fix: test early and add explicit RTL paragraph formatting.
 
 # Execution Phase
 
-## Phase 1 — Skeleton & Plumbing
+## Phase 1 — Skeleton & Plumbing [5 min]
 
 In a new project folder with only [`PLAN.md`](PLAN.md) in it:
 
@@ -45,7 +45,7 @@ After a code review I noticed there were global vars named `ALLOWED_EXTENSIONS` 
 
 ---
 
-## Phase 2 — Transcription Pipeline
+## Phase 2 — Transcription Pipeline [20 min]
 
 Simply pasted the prompt given by the previous session into a new Claude Code session in planning mode; after approving the plan (which looked fine).
 
@@ -59,7 +59,7 @@ Initial commit using Claude to phrase the notes and creating `.gitignore` (doubl
 
 ---
 
-## Phase 3 — Summary & Structured Extraction
+## Phase 3 — Summary & Structured Extraction [60 min]
 
 Pasted the handoff prompt in plan mode while Claude thinks; I generated both API keys needed and pasted them into `.env`.
 
@@ -102,7 +102,7 @@ The bigger 83 MB `.mp3` file worked! Time to check other file types — the test
 
 ---
 
-## Phase 4 — Word Export
+## Phase 4 — Word Export [30 min]
 
 Pasted the handoff prompt in plan mode and went over the plan.
 
@@ -120,7 +120,7 @@ After those fixes the full export flow worked correctly for Hebrew `.wav` — al
 
 ---
 
-## Phase 5 — Hardening & Submission
+## Phase 5 — Hardening & Submission [20 min]
 
 Pasted the handoff prompt in plan mode. Plan covered: fix the local Whisper fallback error message, write the pytest suite, test the split path live, and commit everything.
 
@@ -137,7 +137,7 @@ Tested the split path live: lowered `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET`
 - Prompt: `update plan.md and the other docs`
 - Prompt: `@PLAN.md [x] Environment config is deploy-ready (no hardcoded localhost URLs, env-switchable CORS) — is this right?` (I knew it wasn't when I wrote the prompt)
 
-# Deploy Phase
+# Deploy Phase [20 min]
 
 Checked running the demo locally with and without docker successfully.
 
