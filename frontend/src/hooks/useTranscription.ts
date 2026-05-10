@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { API_BASE } from '../config'
 
 type TranscriptionStatus = 'idle' | 'uploading' | 'success' | 'error'
 
@@ -131,8 +132,8 @@ async function runTranscription(
   formData.append('file', file)
 
   const url = providerOverride
-    ? `/api/transcribe?provider=${encodeURIComponent(providerOverride)}`
-    : '/api/transcribe'
+    ? `${API_BASE}/transcribe?provider=${encodeURIComponent(providerOverride)}`
+    : `${API_BASE}/transcribe`
 
   let response: Response
   try {

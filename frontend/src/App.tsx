@@ -3,6 +3,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { FileUploadUI } from './components/FileUploadUI'
 import { ResultsView } from './components/ResultsView'
 import { clearStoredSummaryResult } from './hooks/useSummarization'
+import { API_BASE } from './config'
 
 interface ProviderInfo {
   provider_name: string
@@ -20,7 +21,7 @@ function App(): JSX.Element {
   )
 
   useEffect(() => {
-    fetch('/api/provider-info')
+    fetch(`${API_BASE}/provider-info`)
       .then<ProviderInfo>(res => res.json())
       .then(data => setProviderInfo(data))
       .catch(() =>

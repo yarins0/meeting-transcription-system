@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE } from '../config'
 
 export interface ActionItem {
   task: string
@@ -74,7 +75,7 @@ async function runSummarization(
 
   let response: Response
   try {
-    response = await fetch('/api/summarize', {
+    response = await fetch(`${API_BASE}/summarize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transcript }),

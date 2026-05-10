@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE } from '../config'
 
 import type { SummaryResult } from './useSummarization'
 
@@ -30,7 +31,7 @@ async function runExport(
 
   let response: Response
   try {
-    response = await fetch('/api/export', {
+    response = await fetch(`${API_BASE}/export`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...summary, transcript }),

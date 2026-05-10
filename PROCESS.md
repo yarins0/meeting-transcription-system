@@ -30,7 +30,7 @@ Fix: test early and add explicit RTL paragraph formatting.
 
 ## Phase 1 — Skeleton & Plumbing
 
-In a new project folder with only `PLAN.md` in it:
+In a new project folder with only [`PLAN.md`](PLAN.md) in it:
 
 - Prompt in plan mode for Claude Code: `@PLAN.md` — this project is all about this plan, read it and describe your plan before writing any code. (There are also rules in the global `CLAUDE.md` which the agent obeys.)
 
