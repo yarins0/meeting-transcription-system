@@ -26,6 +26,14 @@ cp backend/.env.example backend/.env
 
 ### 2. Start the backend
 
+#### Running with Docker (Recommended)
+
+```bash
+cd backend
+docker build -t meeting-transcription-backend .
+docker run -p 8001:8001 --env-file .env meeting-transcription-backend
+```
+
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -69,13 +77,6 @@ python -m pytest tests/ -v
 
 Covers: summarization parsing (empty input, markdown fence stripping, malformed JSON, wrong schema), docx export sections and RTL, FastAPI endpoints (`/health`, `/summarize`, `/export`), and compression pipeline logic (mocked ffmpeg).
 
-## Running with Docker (backend only)
-
-```bash
-cd backend
-docker build -t meeting-transcription-backend .
-docker run -p 8001:8001 --env-file .env meeting-transcription-backend
-```
 
 FFmpeg is baked into the image — no PATH configuration needed.
 
