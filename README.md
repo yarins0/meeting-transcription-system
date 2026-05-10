@@ -8,7 +8,7 @@ Upload an audio recording of a meeting and receive a full transcript, structured
 - Node.js 18+
 - An OpenAI API key (Whisper transcription)
 - An Anthropic API key (Claude summarization — Phase 3)
-- FFmpeg on PATH — required for audio compression (files > 24 MB). Install via:
+- FFmpeg on PATH — required for audio compression (files > 24 MB; ffmpeg is called directly, not via pydub). Install via:
   - **Windows**: `winget install Gyan.FFmpeg` (then restart your terminal)
   - **macOS**: `brew install ffmpeg`
   - **Linux**: `sudo apt install ffmpeg`
@@ -71,7 +71,7 @@ FFmpeg is baked into the image — no PATH configuration needed.
 | Variable | Required | Description |
 |---|---|---|
 | `OPENAI_API_KEY` | Yes | OpenAI key for Whisper transcription |
-| `ANTHROPIC_API_KEY` | Yes (Phase 3+) | Anthropic key for Claude summarization |
+| `ANTHROPIC_API_KEY` | Yes | Anthropic key for Claude summarization (`claude-sonnet-4-6`) |
 | `TRANSCRIPTION_PROVIDER` | No | `whisper_api` (default) or `local_whisper` |
 | `FALLBACK_TRANSCRIPTION_PROVIDER` | No | Provider to retry with on failure (e.g. `local_whisper`) |
 | `FFMPEG_BIN` | No | Full path to FFmpeg `bin/` directory — use when ffmpeg is not on PATH |

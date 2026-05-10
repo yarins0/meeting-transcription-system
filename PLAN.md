@@ -96,32 +96,34 @@ sections. Verb-led action items enforce actionability without extra logic.
 
 ---
 
-### Phase 2 — Transcription Pipeline (60 min)
+### Phase 2 — Transcription Pipeline (60 min) ✅
 **Goal**: Upload an audio file, get back a raw transcript. Compression and error handling included.
 **Tasks**:
-- [ ] `POST /transcribe` endpoint: accepts `multipart/form-data`
-- [ ] pydub compression step before Whisper call (target: under 24MB)
-- [ ] File-type and file-size guard with clear error messages
-- [ ] Call `openai.audio.transcriptions.create`, return transcript text
-- [ ] `FileUploadUI` component: drag-and-drop, loading state ("Transcribing…")
-- [ ] `ErrorBoundary`: on Whisper API failure, show error + "Retry with local model" button
-- [ ] `TranscriptionService` abstracted behind an interface — provider swappable in one place
+- [x] `POST /transcribe` endpoint: accepts `multipart/form-data`
+- [x] Direct ffmpeg compression (replaced pydub) — adaptive bitrate targeting provider.compression_target_bytes
+- [x] Auto-split for very long recordings — N equal segments, each transcribed and joined
+- [x] File-type and file-size guard with clear error messages
+- [x] Call `openai.audio.transcriptions.create`, return transcript text
+- [x] `FileUploadUI` component: drag-and-drop, 4-state rendering, SSE progress reader
+- [x] `ErrorBoundary`: on Whisper API failure, show error + "Retry with local model" button
+- [x] `TranscriptionProvider` ABC — provider swappable in one place; all constraints on the provider class
 
-**Exit criteria**: Upload a real audio file, see its transcript in the browser. Upload a file > 24MB, see a clear error.
+**Validated**: mp3 files (small and 83 MB) transcribed end-to-end.
+**Next validation needed**: other file types (.wav, .m4a, .mp4, .webm); verify split path works correctly across formats.
 
 ---
 
-### Phase 3 — Summary & Structured Extraction (75 min)
+### Phase 3 — Summary & Structured Extraction (75 min) ✅
 **Goal**: Send transcript to Claude, render all 5 structured output sections.
 **Tasks**:
-- [ ] `POST /summarize` endpoint: accepts `{"transcript": "..."}`, calls Claude with system prompt above
-- [ ] Parse Claude's JSON response into a typed Pydantic model
-- [ ] Return structured data from FastAPI
-- [ ] `ResultsView` component: renders transcript + 5 sections with clear headers
-- [ ] Graceful empty states: "No decisions recorded", "No action items" — never crashes on empty arrays
-- [ ] Language detection visible in UI (small badge: "Meeting language: Hebrew")
+- [x] `POST /summarize` endpoint: accepts `{"transcript": "..."}`, calls `claude-sonnet-4-6` with structured system prompt
+- [x] Parse Claude's JSON response into typed Pydantic model (`ActionItem`, `SummaryResponse`)
+- [x] Return structured data from FastAPI
+- [x] `ResultsView` component: language badge + 5 sections with staggered animations
+- [x] Graceful empty states: "No decisions recorded", "No action items"
+- [x] Auto-summarize immediately after transcription completes
 
-**Exit criteria**: Paste a transcript manually into a test call, see all sections rendered correctly in the browser.
+**Validated**: transcript + summary flow works end-to-end with real audio.
 
 ---
 
@@ -135,6 +137,15 @@ sections. Verb-led action items enforce actionability without extra logic.
 - [ ] Button disabled until summary is ready
 
 **Exit criteria**: Click download, open in Word — all 5 sections present, Hebrew text reads right-to-left.
+
+---
+
+### Phase 4.5 — File Type Validation (before Phase 5)
+**Goal**: Confirm all supported formats work before submission.
+**Approach** (cheap — don't waste full Whisper tokens):
+- [ ] Upload a `.wav`, `.m4a`, `.mp4`, `.webm` file each — verify they reach Whisper without format/compression errors
+- [ ] Trigger the split path with a >3.5hr recording (or by temporarily lowering `compression_threshold_bytes`) — verify N-segment progress messages appear and parts join correctly
+- [ ] Only run full transcription on 1–2 representative formats to validate transcript quality
 
 ---
 

@@ -4,7 +4,7 @@
 - **Backend**: FastAPI (Python) · port **8001** (8000 is taken by another project on this machine)
 - **Frontend**: React + Vite + TypeScript · port **5173**
 - **Transcription**: OpenAI Whisper API (default) — provider-swappable via env var
-- **Summarization**: Anthropic Claude API (`claude-sonnet-4-20250514`) — Phase 3
+- **Summarization**: Anthropic Claude API (`claude-sonnet-4-6`)
 - **Export**: python-docx (.docx download) — Phase 4
 
 ## Running Locally
@@ -27,16 +27,26 @@ Copy `backend/.env.example` → `backend/.env` and fill in API keys before start
 
 ### Transcription Provider Interface
 Every transcription backend lives in `backend/transcription/` and must extend `TranscriptionProvider` (ABC in `base.py`).
-Each provider owns three pieces of config:
-- `provider_name: str` — shown in SSE progress messages and UI
-- `allowed_extensions: frozenset[str]` — validated before reading the file
-- `compression_threshold_bytes: int` — pydub compresses to mp3 when exceeded
+Each provider declares all its own constraints — `main.py` has zero provider-specific knowledge.
+
+Provider properties:
+| Property | Purpose |
+|---|---|
+| `provider_name` | Shown in SSE progress messages and UI badge |
+| `allowed_extensions` | Validated client-side and server-side before reading the file |
+| `compression_threshold_bytes` | Trigger compression when file exceeds this |
+| `upload_size_limit_bytes` | Hard cap the API enforces per request |
+| `compression_target_bytes` | Aim for this after compression (includes headroom for encoder variance) |
+| `min_compression_bitrate_kbps` | Floor for audio quality when compressing |
+| `max_compression_bitrate_kbps` | Ceiling — no benefit beyond this for mono speech |
+
+Compression uses direct `ffmpeg` subprocess (not pydub). Bitrate is computed per recording from duration so the output lands just under `compression_target_bytes`. Files too long for one segment are split automatically.
 
 Current providers:
-| Key | Class | Threshold |
-|---|---|---|
-| `whisper_api` | `WhisperApiProvider` | 24 MB (Whisper API hard cap is 25 MB) |
-| `local_whisper` | `LocalWhisperProvider` | 500 MB (stub — see file for impl notes) |
+| Key | Class | compress threshold | upload limit |
+|---|---|---|---|
+| `whisper_api` | `WhisperApiProvider` | 24 MB | 25 MB |
+| `local_whisper` | `LocalWhisperProvider` | 500 MB (stub) | 2 GB |
 
 To add a new provider: create a file in `backend/transcription/`, subclass `TranscriptionProvider`, add it to `_REGISTRY` in `__init__.py`, set `TRANSCRIPTION_PROVIDER=your_key` in `.env`.
 
