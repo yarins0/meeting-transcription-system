@@ -95,6 +95,8 @@ The 413 still hadn't resolved because "the mp3 encoder runs 4–5% over the targ
 
 The bigger 83 MB `.mp3` file worked! Time to check other file types — the test should be simple: just check if the split works fine and then if the transcription works for the first 2 parts, in order to not waste tokens.
 
+**Summarization system prompt** — the instruction set sent to Claude on every `/summarize` call lives in [`backend/prompts.md`](backend/prompts.md). It tells the model to return structured JSON only (no markdown wrapping), respond in the meeting's dominant language, and follow specific rules for participants, decisions, and action items. To change what Claude extracts or how it formats output, edit `prompts.md` directly — no Python needed. `summarization.py` reads it at startup and passes it as the `system=` parameter unchanged.
+
 - Prompt: `/document-release` (skill that updated the docs and pushed the code)
 - Prompt: `/handoff`
 
@@ -134,3 +136,7 @@ Tested the split path live: lowered `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET`
 
 - Prompt: `update plan.md and the other docs`
 - Prompt: `@PLAN.md [x] Environment config is deploy-ready (no hardcoded localhost URLs, env-switchable CORS) — is this right?` (I knew it wasn't when I wrote the prompt)
+
+# Deploy Phase
+
+Checked running the demo locally with and without docker successfully.

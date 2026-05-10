@@ -96,7 +96,7 @@ FFmpeg is baked into the image — no PATH configuration needed.
 - **Backend**: FastAPI (Python) · port 8001
 - **Frontend**: React + Vite + TypeScript · port 5173
 - **Transcription**: OpenAI Whisper API (provider-swappable via env var)
-- **Summarization**: Anthropic Claude API — Phase 3
+- **Summarization**: Anthropic Claude API (`claude-sonnet-4-6`) — system prompt lives in [`backend/prompts.md`](backend/prompts.md)
 - **Export**: python-docx (.docx download) — Phase 4
 
 ## Phase Status
