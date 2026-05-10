@@ -56,6 +56,8 @@ curl http://localhost:8001/provider-info
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
+> **API docs**: FastAPI auto-generates interactive docs at [http://localhost:8001/docs](http://localhost:8001/docs) (Swagger UI — try endpoints live) and [http://localhost:8001/redoc](http://localhost:8001/redoc) (ReDoc reference).
+
 ## Running Tests
 
 The backend has a pytest suite (44 tests, ~3s):
