@@ -50,11 +50,47 @@ Initiall commit using claude to phrase the notes and creating .gitignore (double
 - Prompt: /handoff
 
 ## Phase 3 of PLAN
-I paste the handoff prompt in plan mode, while claud ethinks i generate both API keys needed and paste into .env.
+I paste the handoff prompt in plan mode, while claud thinks i generate both API keys needed and paste into .env.
 
 when pasing a smaller file                                                     
 ❯ Missing credentials. Please pass an `api_key`, `workload_identity`, `admin_api_key`, or 
 set the `OPENAI_API_KEY` or `OPENAI_ADMIN_KEY` environment variable. 
 When putting  a bigger one (82.9.MB) ❯ "No module named 'pyaudioop'"
 
-This started a long debugging session, meanwhile i ran a purly frontend-design agent to 
+This started a long debugging session, meanwhile i ran a purly frontend-design agent and deployed to a new branch.
+
+After some time another error acuured that made me relise that the code cant see ANY .env vars, so i fixed the import and now both the transcription and summary work well for files smaller than 25MB - English meething.
+
+- Prompt /debug 
+Error code: 413 - {'error': {'message': '413: Maximum content size limit (26214400)     
+  exceeded (26265624 bytes read)', 'type': 'server_error', 'param': None, 'code': None},  
+  'usage': {'type': 'duration', 'seconds': 0}} for the big file, also got Local Whisper   
+  provider is not yet implemented. See local_whisper.py for setup instructions. error     
+  after hitting try fallback button.
+
+The problem was that the compreesion wasnt enough- the comprased file was 26MB, calude suggested upping the bitrate in order to get a smaller file.
+
+- Prompt: can we compute the minimal bit rate needed? that way we can get as close as we can to
+  25MB.
+
+- Prompt: This is too messy, lets try splitting the file to smaller pieces instead
+
+The 413 still hsant resolved becaude "the mp3 encoder runs 4–5% over the target bitrate, pushing 23.8 MB theoretical → 25.1 MB actual." as claude claims which seems right after testing and logging the actual sizes.
+
+The bigger 83MB .mps file worked!, time to check other file types - the test should be dumb - just check if the split works fine and than if the transcription work for the first 2 parts in order to not waste tokens.
+
+- Prompt: /document-release (skill that updated the docs and pushed the code)
+
+- Prompt /handoff
+
+## Phase 4 of PLAN
+
+I paste the handoff prompt in plan mode and went over the plan.
+
+After some adjustments like: "account for right to left languages" claude started executing the plan.
+
+While claude builds, i tested for .wav file with an hebrew meeting which got back an empty transcript from Whisper and crushed the app, than added an empty response handling.
+The response was full on the next time (didnt display right to left on the web so fixed with anoter agent that also added sessionStorage use).
+
+After checking the .docx file for the hbrew .wav meeting:
+- Prompt: the docx file is missing the transcript section + the table content doesnt turn right to left when needed    

@@ -2,7 +2,7 @@ import json
 import os
 
 import anthropic
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 _SYSTEM_PROMPT = """\
 You are an expert meeting analyst. You will receive a raw transcript of a meeting.
@@ -63,13 +63,33 @@ class SummaryService:
         return anthropic.Anthropic(api_key=api_key)
 
     def summarize(self, transcript: str) -> SummaryResponse:
+        if not transcript.strip():
+            raise ValueError("Transcript is empty — nothing to summarize.")
+
         client = self._get_client()
         message = client.messages.create(
             model=_MODEL,
             max_tokens=_MAX_TOKENS,
             system=_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": transcript}],
+            timeout=120.0,
         )
-        raw_json = message.content[0].text
+
+        if not message.content:
+            raise ValueError("Claude returned an empty response.")
+
+        raw_json = message.content[0].text.strip()
+
+        # Claude sometimes wraps JSON in a markdown code fence despite being told not to.
+        if raw_json.startswith("```"):
+            raw_json = raw_json.split("\n", 1)[-1]
+            raw_json = raw_json.rsplit("```", 1)[0].strip()
+
+        if not raw_json:
+            raise ValueError("Claude returned an empty response body.")
+
         data = json.loads(raw_json)
-        return SummaryResponse(**data)
+        try:
+            return SummaryResponse(**data)
+        except ValidationError as exc:
+            raise ValueError(f"Claude returned an unexpected JSON structure: {exc}") from exc

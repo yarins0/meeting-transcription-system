@@ -446,6 +446,17 @@ export function FileUploadUI({ allowedExtensions, fallbackProviderKey, onTranscr
         }}>
           or click to browse&nbsp;&nbsp;·&nbsp;&nbsp;{allowedExtensions.join('  ')}
         </p>
+        <p style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.6rem',
+          letterSpacing: '0.06em',
+          color: 'var(--text-secondary)',
+          textTransform: 'uppercase',
+          marginTop: '0.5rem',
+          opacity: 0.55,
+        }}>
+          Over 24 MB? Auto-compressed&nbsp;&nbsp;·&nbsp;&nbsp;500 MB max
+        </p>
       </div>
       {validationError && (
         <p style={{

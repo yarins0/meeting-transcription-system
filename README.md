@@ -89,5 +89,5 @@ FFmpeg is baked into the image — no PATH configuration needed.
 - [x] Phase 1 — FastAPI + Vite scaffold, /health, /provider-info, SSE streaming
 - [x] Phase 2 — FileUploadUI (drag-and-drop), SSE progress reader, ErrorBoundary, retry flow
 - [x] Phase 3 — /summarize endpoint + Claude integration + ResultsView
-- [ ] Phase 4 — /export endpoint + Word download
+- [x] Phase 4 — /export endpoint + Word download (RTL support for Hebrew)
 - [ ] Phase 5 — Hardening, edge cases, PROCESS.md, submission polish

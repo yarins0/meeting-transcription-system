@@ -17,7 +17,7 @@ class WhisperApiProvider(TranscriptionProvider):
 
     def _get_client(self) -> openai.OpenAI:
         if self._client is None:
-            self._client = openai.OpenAI()
+            self._client = openai.OpenAI(timeout=120.0)
         return self._client
 
     @property

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FileUploadUI } from './components/FileUploadUI'
 import { ResultsView } from './components/ResultsView'
+import { clearStoredSummaryResult } from './hooks/useSummarization'
 
 interface ProviderInfo {
   provider_name: string
@@ -10,10 +11,13 @@ interface ProviderInfo {
 }
 
 const FALLBACK_EXTENSIONS = ['.flac', '.m4a', '.mp3', '.mp4', '.ogg', '.wav', '.webm']
+const SESSION_TRANSCRIPT_KEY = 'mts_transcript'
 
 function App(): JSX.Element {
   const [providerInfo, setProviderInfo] = useState<ProviderInfo | null>(null)
-  const [transcript, setTranscript] = useState<string | null>(null)
+  const [transcript, setTranscript] = useState<string | null>(
+    () => sessionStorage.getItem(SESSION_TRANSCRIPT_KEY),
+  )
 
   useEffect(() => {
     fetch('/api/provider-info')
@@ -29,10 +33,14 @@ function App(): JSX.Element {
   }, [])
 
   function handleTranscriptReady(text: string): void {
+    clearStoredSummaryResult()
+    sessionStorage.setItem(SESSION_TRANSCRIPT_KEY, text)
     setTranscript(text)
   }
 
   function handleReset(): void {
+    clearStoredSummaryResult()
+    sessionStorage.removeItem(SESSION_TRANSCRIPT_KEY)
     setTranscript(null)
   }
 

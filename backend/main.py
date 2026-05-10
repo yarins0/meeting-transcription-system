@@ -1,4 +1,5 @@
 import asyncio
+import io
 import json
 import math
 import os
@@ -14,6 +15,7 @@ from fastapi import FastAPI, File, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
+from export import ExportRequest, build_docx
 from summarization import SummarizeRequest, SummaryResponse, SummaryService
 from transcription import TranscriptionProvider, get_provider
 
@@ -189,6 +191,16 @@ async def _stream_transcription(file: UploadFile, provider: TranscriptionProvide
 async def summarize(body: SummarizeRequest) -> SummaryResponse:
     service = SummaryService()
     return await asyncio.to_thread(service.summarize, body.transcript)
+
+
+@app.post("/export")
+async def export_summary(body: ExportRequest) -> StreamingResponse:
+    docx_bytes = await asyncio.to_thread(build_docx, body)
+    return StreamingResponse(
+        io.BytesIO(docx_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": 'attachment; filename="meeting-summary.docx"'},
+    )
 
 
 @app.get("/health")

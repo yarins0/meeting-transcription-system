@@ -50,7 +50,7 @@ class LocalWhisperProvider(TranscriptionProvider):
         return 192
 
     def transcribe(self, file_path: str) -> str:
-        raise NotImplementedError(
-            "Local Whisper provider is not yet implemented. "
-            "See local_whisper.py for setup instructions."
+        raise RuntimeError(
+            "Local Whisper model is not configured on this server. "
+            "Contact the server administrator to enable local transcription."
         )

@@ -1,5 +1,18 @@
 import { useEffect } from 'react'
+import { useExport } from '../hooks/useExport'
 import { useSummarization, type ActionItem, type SummaryResult } from '../hooks/useSummarization'
+
+const RTL_LANGUAGE_KEYS = new Set([
+  'he', 'heb', 'hebrew', 'עברית',
+  'ar', 'ara', 'arabic', 'عربي', 'عربية',
+  'fa', 'per', 'fas', 'persian', 'farsi', 'فارسی',
+  'ur', 'urd', 'urdu', 'اردو',
+  'yi', 'yid', 'yiddish',
+])
+
+function isRtlLanguage(language: string): boolean {
+  return RTL_LANGUAGE_KEYS.has(language.toLowerCase().trim())
+}
 
 interface ResultsViewProps {
   transcript: string
@@ -111,7 +124,7 @@ function ParticipantsList({ participants }: { participants: string[] }): JSX.Ele
   )
 }
 
-function DecisionsList({ decisions }: { decisions: string[] }): JSX.Element {
+function DecisionsList({ decisions, isRtl = false }: { decisions: string[]; isRtl?: boolean }): JSX.Element {
   if (decisions.length === 0) {
     return (
       <p style={{
@@ -132,7 +145,9 @@ function DecisionsList({ decisions }: { decisions: string[] }): JSX.Element {
           fontSize: '0.9rem',
           color: 'var(--text-primary)',
           padding: '0.5rem 0.875rem',
-          borderLeft: '2px solid var(--accent-border)',
+          ...(isRtl
+            ? { borderRight: '2px solid var(--accent-border)' }
+            : { borderLeft: '2px solid var(--accent-border)' }),
           marginBottom: '0.5rem',
           lineHeight: 1.55,
           background: 'var(--accent-subtle)',
@@ -144,7 +159,7 @@ function DecisionsList({ decisions }: { decisions: string[] }): JSX.Element {
   )
 }
 
-function ActionItemsTable({ actionItems }: { actionItems: ActionItem[] }): JSX.Element {
+function ActionItemsTable({ actionItems, isRtl = false }: { actionItems: ActionItem[]; isRtl?: boolean }): JSX.Element {
   if (actionItems.length === 0) {
     return (
       <p style={{
@@ -159,7 +174,7 @@ function ActionItemsTable({ actionItems }: { actionItems: ActionItem[] }): JSX.E
   }
 
   const headerCell: React.CSSProperties = {
-    textAlign: 'left',
+    textAlign: isRtl ? 'right' : 'left',
     padding: '0.5rem 0.875rem',
     fontFamily: 'var(--font-mono)',
     fontSize: '0.58rem',
@@ -216,15 +231,21 @@ function ActionItemsTable({ actionItems }: { actionItems: ActionItem[] }): JSX.E
   )
 }
 
-function SummaryContent({ result, transcript, onReset }: {
+function SummaryContent({ result, transcript, onReset, onExport, isExporting, exportError }: {
   result: SummaryResult
   transcript: string
   onReset: () => void
+  onExport: () => void
+  isExporting: boolean
+  exportError: string | null
 }): JSX.Element {
+  const isRtl = isRtlLanguage(result.language)
+
   return (
-    <div>
+    <div dir={isRtl ? 'rtl' : 'ltr'}>
       <div style={{
         display: 'flex',
+        flexDirection: isRtl ? 'row-reverse' : 'row',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
@@ -262,17 +283,18 @@ function SummaryContent({ result, transcript, onReset }: {
       </SectionBlock>
 
       <SectionBlock number="03" title="Decisions" delay={240}>
-        <DecisionsList decisions={result.decisions} />
+        <DecisionsList decisions={result.decisions} isRtl={isRtl} />
       </SectionBlock>
 
       <SectionBlock number="04" title="Action Items" delay={320}>
-        <ActionItemsTable actionItems={result.action_items} />
+        <ActionItemsTable actionItems={result.action_items} isRtl={isRtl} />
       </SectionBlock>
 
       <SectionBlock number="05" title="Full Transcript" delay={400}>
         <textarea
           readOnly
           value={transcript}
+          dir={isRtl ? 'rtl' : 'ltr'}
           style={{
             width: '100%',
             minHeight: 200,
@@ -291,24 +313,55 @@ function SummaryContent({ result, transcript, onReset }: {
         />
       </SectionBlock>
 
-      <div style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '480ms' }}>
-        <button
-          onClick={onReset}
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.68rem',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            background: 'transparent',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border-strong)',
-            borderRadius: 2,
-            padding: '0.5rem 1.25rem',
-            cursor: 'pointer',
-          }}
-        >
-          New Recording
-        </button>
+      <div dir="ltr" style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '480ms' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            onClick={onExport}
+            disabled={isExporting}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.68rem',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              background: isExporting ? 'var(--accent-subtle)' : 'var(--accent)',
+              color: isExporting ? 'var(--accent)' : 'var(--text-on-accent)',
+              border: '1px solid var(--accent-border)',
+              borderRadius: 2,
+              padding: '0.5rem 1.25rem',
+              cursor: isExporting ? 'not-allowed' : 'pointer',
+              opacity: isExporting ? 0.7 : 1,
+            }}
+          >
+            {isExporting ? 'Exporting…' : 'Download as Word'}
+          </button>
+          <button
+            onClick={onReset}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.68rem',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              background: 'transparent',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-strong)',
+              borderRadius: 2,
+              padding: '0.5rem 1.25rem',
+              cursor: 'pointer',
+            }}
+          >
+            New Recording
+          </button>
+        </div>
+        {exportError !== null && (
+          <p style={{
+            marginTop: '0.625rem',
+            fontFamily: 'var(--font-body)',
+            fontSize: '0.825rem',
+            color: 'var(--red)',
+          }}>
+            {exportError}
+          </p>
+        )}
       </div>
     </div>
   )
@@ -316,10 +369,11 @@ function SummaryContent({ result, transcript, onReset }: {
 
 export function ResultsView({ transcript, onReset }: ResultsViewProps): JSX.Element {
   const { status, result, errorMessage, summarize } = useSummarization()
+  const { isExporting, exportError, triggerExport } = useExport()
 
   useEffect(() => {
-    summarize(transcript)
-    // Run once on mount — transcript is stable for the lifetime of this component.
+    // Skip the API call if a result was already restored from sessionStorage.
+    if (status !== 'success') summarize(transcript)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -416,5 +470,14 @@ export function ResultsView({ transcript, onReset }: ResultsViewProps): JSX.Elem
     )
   }
 
-  return <SummaryContent result={result!} transcript={transcript} onReset={onReset} />
+  return (
+    <SummaryContent
+      result={result!}
+      transcript={transcript}
+      onReset={onReset}
+      onExport={() => triggerExport(result!, transcript)}
+      isExporting={isExporting}
+      exportError={exportError}
+    />
+  )
 }

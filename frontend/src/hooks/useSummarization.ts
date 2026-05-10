@@ -33,14 +33,33 @@ const INITIAL_STATE: SummarizationState = {
   errorMessage: null,
 }
 
+const SESSION_RESULT_KEY = 'mts_summary_result'
+
+export function clearStoredSummaryResult(): void {
+  sessionStorage.removeItem(SESSION_RESULT_KEY)
+}
+
+function loadStoredState(): SummarizationState {
+  const stored = sessionStorage.getItem(SESSION_RESULT_KEY)
+  if (stored === null) return INITIAL_STATE
+  try {
+    const result = JSON.parse(stored) as SummaryResult
+    return { status: 'success', result, errorMessage: null }
+  } catch {
+    return INITIAL_STATE
+  }
+}
+
 export function useSummarization(): UseSummarizationResult {
-  const [state, setState] = useState<SummarizationState>(INITIAL_STATE)
+  const [state, setState] = useState<SummarizationState>(loadStoredState)
 
   function reset(): void {
+    sessionStorage.removeItem(SESSION_RESULT_KEY)
     setState(INITIAL_STATE)
   }
 
   function summarize(transcript: string): void {
+    if (state.status === 'success') return
     void runSummarization(transcript, setState)
   }
 
@@ -78,5 +97,6 @@ async function runSummarization(
     return
   }
 
+  sessionStorage.setItem(SESSION_RESULT_KEY, JSON.stringify(data))
   setState({ status: 'success', result: data, errorMessage: null })
 }

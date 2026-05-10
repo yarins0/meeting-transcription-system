@@ -127,16 +127,16 @@ sections. Verb-led action items enforce actionability without extra logic.
 
 ---
 
-### Phase 4 — Word Export (45 min)
+### Phase 4 — Word Export (45 min) ✅
 **Goal**: "Download as Word" button produces a well-formatted .docx.
 **Tasks**:
-- [ ] `POST /export` endpoint: accepts full structured summary, returns `.docx` as file response
-- [ ] python-docx: heading per section, bulleted lists for participants/decisions/action items
-- [ ] RTL paragraph direction for Hebrew output (test this explicitly)
-- [ ] React: handle blob response, trigger browser download
-- [ ] Button disabled until summary is ready
+- [x] `POST /export` endpoint: accepts full structured summary, returns `.docx` as file response
+- [x] python-docx: heading per section, bulleted lists for participants/decisions/action items
+- [x] RTL paragraph direction for Hebrew output (w:bidi on paragraphs + w:bidiVisual on table)
+- [x] React: handle blob response, trigger browser download
+- [x] Button disabled until summary is ready
 
-**Exit criteria**: Click download, open in Word — all 5 sections present, Hebrew text reads right-to-left.
+**Validated**: Hebrew .wav meeting exported correctly — all 5 sections present, table cells RTL.
 
 ---
 
