@@ -1,0 +1,131 @@
+/* ==========================================================================
+   DISPATCH — Design Token Reference
+   Edit values here to retheme the entire app.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Backgrounds
+   bg-primary  → page background
+   bg-surface  → card / dropzone / table backgrounds
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-primary: #1a1a22;
+  --bg-surface: #22222c;
+}
+
+/* --------------------------------------------------------------------------
+   Accent (gold/amber)
+   accent        → borders, labels, waveform bars, active states
+   accent-dim    → faint tinted card backgrounds
+   accent-border → semi-transparent border color
+   -------------------------------------------------------------------------- */
+:root {
+  --accent:        #c8922a;
+  --accent-dim:    rgba(200, 146, 42, 0.12);
+  --accent-border: rgba(200, 146, 42, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   Text
+   text-primary   → headings, body copy
+   text-secondary → labels, placeholder, muted info
+   -------------------------------------------------------------------------- */
+:root {
+  --text-primary:   #e8e0d0;
+  --text-secondary: #7a7268;
+}
+
+/* --------------------------------------------------------------------------
+   Borders
+   border       → subtle dividers and table lines
+   border-strong → slightly more visible borders
+   -------------------------------------------------------------------------- */
+:root {
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+}
+
+/* --------------------------------------------------------------------------
+   Status colours
+   -------------------------------------------------------------------------- */
+:root {
+  --red:          #e05252;
+  --red-dim:      rgba(224, 82, 82, 0.12);
+  --red-border:   rgba(224, 82, 82, 0.3);
+  --green:        #4caf82;
+  --green-dim:    rgba(76, 175, 130, 0.12);
+  --green-border: rgba(76, 175, 130, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Surfaces & overlays
+   accent-subtle  → barely-visible tint on decision items
+   row-alt        → alternating table row background
+   text-on-accent → dark text for use on amber/gold buttons
+   -------------------------------------------------------------------------- */
+:root {
+  --accent-subtle:  rgba(200, 146, 42, 0.04);
+  --row-alt:        rgba(255, 255, 255, 0.025);
+  --text-on-accent: #111111;
+}
+
+/* --------------------------------------------------------------------------
+   Typography
+   font-display → serif headings (Cormorant Garamond loaded in index.html)
+   font-body    → body text (Figtree)
+   font-mono    → monospace labels, transcript (IBM Plex Mono)
+   -------------------------------------------------------------------------- */
+:root {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Figtree', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+}
+
+/* ==========================================================================
+   Base reset + global styles
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background:  var(--bg-primary);
+  color:       var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  min-height:  100vh;
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   Keyframe animations (referenced by component inline styles)
+   ========================================================================== */
+
+@keyframes pulse-bar {
+  0%, 100% { transform: scaleY(0.3); opacity: 0.35; }
+  50%       { transform: scaleY(1);   opacity: 1;    }
+}
+
+@keyframes blink-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes indeterminate {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(400%);  }
+}

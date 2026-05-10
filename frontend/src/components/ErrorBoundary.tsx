@@ -25,7 +25,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#374151' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-primary)' }}>
           <h2>Something went wrong</h2>
           <p>The application encountered an unexpected error.</p>
           <button

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FileUploadUI } from './components/FileUploadUI'
+import { ResultsView } from './components/ResultsView'
 
 interface ProviderInfo {
   provider_name: string
@@ -8,11 +9,11 @@ interface ProviderInfo {
   fallback_provider_key: string | null
 }
 
-// Used when /provider-info is unreachable so the UI stays functional.
 const FALLBACK_EXTENSIONS = ['.flac', '.m4a', '.mp3', '.mp4', '.ogg', '.wav', '.webm']
 
 function App(): JSX.Element {
   const [providerInfo, setProviderInfo] = useState<ProviderInfo | null>(null)
+  const [transcript, setTranscript] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/provider-info')
@@ -27,27 +28,105 @@ function App(): JSX.Element {
       )
   }, [])
 
+  function handleTranscriptReady(text: string): void {
+    setTranscript(text)
+  }
+
+  function handleReset(): void {
+    setTranscript(null)
+  }
+
   return (
-    <div style={{ fontFamily: 'sans-serif', maxWidth: 800, margin: '0 auto', padding: '2rem' }}>
-      <h1 style={{ marginBottom: 4 }}>Meeting Transcription</h1>
-      <p style={{ color: '#6b7280', marginTop: 0 }}>
-        Upload a meeting recording to get a full transcript.
-        {providerInfo && (
-          <span style={{ marginLeft: 8, fontSize: '0.8rem', background: '#e0e7ff', color: '#3730a3', padding: '2px 8px', borderRadius: 4 }}>
-            {providerInfo.provider_name}
-          </span>
-        )}
-      </p>
-      <ErrorBoundary>
-        {providerInfo === null ? (
-          <p style={{ color: '#9ca3af' }}>Loading…</p>
-        ) : (
-          <FileUploadUI
-            allowedExtensions={providerInfo.allowed_extensions}
-            fallbackProviderKey={providerInfo.fallback_provider_key ?? undefined}
-          />
-        )}
-      </ErrorBoundary>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '0 1.5rem 5rem',
+    }}>
+      {/* Amber gradient rule across the top */}
+      <div style={{
+        width: '100%',
+        maxWidth: 760,
+        height: 2,
+        background: 'linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent)',
+        marginBottom: '3rem',
+        opacity: 0.6,
+      }} />
+
+      <div style={{ width: '100%', maxWidth: 760 }}>
+        <header style={{ marginBottom: '2.75rem' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
+            marginBottom: '0.875rem',
+          }}>
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.25rem, 6vw, 3.5rem)',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              color: 'var(--text-primary)',
+              lineHeight: 1,
+            }}>
+              Meeting Transcription
+            </h1>
+            {providerInfo && !transcript && (
+              <span style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.6rem',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--accent)',
+                border: '1px solid var(--accent-border)',
+                padding: '4px 10px',
+                borderRadius: 2,
+                marginBottom: '0.2rem',
+              }}>
+                {providerInfo.provider_name}
+              </span>
+            )}
+          </div>
+
+          <div style={{ height: 1, background: 'var(--border-strong)', marginBottom: '0.875rem' }} />
+
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '0.875rem',
+            fontWeight: 300,
+            color: 'var(--text-secondary)',
+            letterSpacing: '0.01em',
+          }}>
+            Upload a meeting recording — receive a full transcript and structured intelligence brief.
+          </p>
+        </header>
+
+        <ErrorBoundary>
+          {transcript !== null ? (
+            <ResultsView transcript={transcript} onReset={handleReset} />
+          ) : providerInfo === null ? (
+            <div style={{
+              padding: '4rem 0',
+              textAlign: 'center',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.7rem',
+              letterSpacing: '0.12em',
+              color: 'var(--text-secondary)',
+            }}>
+              INITIALIZING<span style={{ animation: 'blink-cursor 1s step-end infinite' }}>_</span>
+            </div>
+          ) : (
+            <FileUploadUI
+              allowedExtensions={providerInfo.allowed_extensions}
+              fallbackProviderKey={providerInfo.fallback_provider_key ?? undefined}
+              onTranscriptReady={handleTranscriptReady}
+            />
+          )}
+        </ErrorBoundary>
+      </div>
     </div>
   )
 }

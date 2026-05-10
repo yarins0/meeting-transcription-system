@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 type TranscriptionStatus = 'idle' | 'uploading' | 'success' | 'error'
 
@@ -13,6 +13,7 @@ interface TranscriptionState {
 export interface UseTranscriptionResult extends TranscriptionState {
   transcribe: (file: File, providerOverride?: string) => void
   reset: () => void
+  cancel: () => void
 }
 
 interface SseEvent {
@@ -97,22 +98,32 @@ async function readSseStream(
 
 export function useTranscription(): UseTranscriptionResult {
   const [state, setState] = useState<TranscriptionState>(INITIAL_STATE)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   function reset(): void {
     setState(INITIAL_STATE)
   }
 
-  function transcribe(file: File, providerOverride?: string): void {
-    void runTranscription(file, providerOverride, setState)
+  function cancel(): void {
+    abortControllerRef.current?.abort()
+    abortControllerRef.current = null
+    setState(INITIAL_STATE)
   }
 
-  return { ...state, transcribe, reset }
+  function transcribe(file: File, providerOverride?: string): void {
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+    void runTranscription(file, providerOverride, setState, controller.signal)
+  }
+
+  return { ...state, transcribe, reset, cancel }
 }
 
 async function runTranscription(
   file: File,
   providerOverride: string | undefined,
   setState: React.Dispatch<React.SetStateAction<TranscriptionState>>,
+  signal: AbortSignal,
 ): Promise<void> {
   setState({ ...INITIAL_STATE, status: 'uploading', progressMessage: 'Uploading...' })
 
@@ -125,8 +136,9 @@ async function runTranscription(
 
   let response: Response
   try {
-    response = await fetch(url, { method: 'POST', body: formData })
-  } catch {
+    response = await fetch(url, { method: 'POST', body: formData, signal })
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') return
     setState({
       status: 'error',
       progressMessage: '',
@@ -150,7 +162,8 @@ async function runTranscription(
 
   try {
     await readSseStream(response.body, setState)
-  } catch {
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') return
     // Stream dropped mid-way (network failure after the initial connection).
     setState({
       status: 'error',
