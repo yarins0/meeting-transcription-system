@@ -8,7 +8,10 @@ Upload an audio recording of a meeting and receive a full transcript, structured
 - Node.js 18+
 - An OpenAI API key (Whisper transcription)
 - An Anthropic API key (Claude summarization — Phase 3)
-- FFmpeg on PATH (only required when uploaded files exceed 24 MB — used by pydub for compression)
+- FFmpeg on PATH — required for audio compression (files > 24 MB). Install via:
+  - **Windows**: `winget install Gyan.FFmpeg` (then restart your terminal)
+  - **macOS**: `brew install ffmpeg`
+  - **Linux**: `sudo apt install ffmpeg`
 
 ## Local Setup
 
@@ -53,6 +56,16 @@ curl http://localhost:8001/provider-info
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Running with Docker (backend only)
+
+```bash
+cd backend
+docker build -t meeting-transcription-backend .
+docker run -p 8001:8001 --env-file .env meeting-transcription-backend
+```
+
+FFmpeg is baked into the image — no PATH configuration needed.
+
 ## Environment Variables
 
 | Variable | Required | Description |
@@ -61,6 +74,7 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 | `ANTHROPIC_API_KEY` | Yes (Phase 3+) | Anthropic key for Claude summarization |
 | `TRANSCRIPTION_PROVIDER` | No | `whisper_api` (default) or `local_whisper` |
 | `FALLBACK_TRANSCRIPTION_PROVIDER` | No | Provider to retry with on failure (e.g. `local_whisper`) |
+| `FFMPEG_BIN` | No | Full path to FFmpeg `bin/` directory — use when ffmpeg is not on PATH |
 
 ## Stack
 
@@ -74,6 +88,6 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
 - [x] Phase 1 — FastAPI + Vite scaffold, /health, /provider-info, SSE streaming
 - [x] Phase 2 — FileUploadUI (drag-and-drop), SSE progress reader, ErrorBoundary, retry flow
-- [ ] Phase 3 — /summarize endpoint + Claude integration + ResultsView
+- [x] Phase 3 — /summarize endpoint + Claude integration + ResultsView
 - [ ] Phase 4 — /export endpoint + Word download
 - [ ] Phase 5 — Hardening, edge cases, PROCESS.md, submission polish

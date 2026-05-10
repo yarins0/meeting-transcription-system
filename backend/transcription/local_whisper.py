@@ -1,7 +1,6 @@
 from .base import TranscriptionProvider
 
-# Local model has no API size limit; compress only very large files to reduce RAM usage.
-_LOCAL_COMPRESSION_THRESHOLD = 500 * 1024 * 1024  # 500 MB
+_GB = 1024 * 1024 * 1024
 
 
 class LocalWhisperProvider(TranscriptionProvider):
@@ -25,7 +24,6 @@ class LocalWhisperProvider(TranscriptionProvider):
 
     @property
     def allowed_extensions(self) -> frozenset[str]:
-        # pydub + FFmpeg can decode virtually any audio/video container
         return frozenset({
             ".mp3", ".mp4", ".wav", ".m4a",
             ".ogg", ".webm", ".flac", ".aac", ".opus",
@@ -33,7 +31,23 @@ class LocalWhisperProvider(TranscriptionProvider):
 
     @property
     def compression_threshold_bytes(self) -> int:
-        return _LOCAL_COMPRESSION_THRESHOLD
+        return 500 * 1024 * 1024  # compress above 500 MB to reduce RAM pressure
+
+    @property
+    def upload_size_limit_bytes(self) -> int:
+        return 2 * _GB  # effectively no limit for a local model
+
+    @property
+    def compression_target_bytes(self) -> int:
+        return 490 * 1024 * 1024
+
+    @property
+    def min_compression_bitrate_kbps(self) -> int:
+        return 32
+
+    @property
+    def max_compression_bitrate_kbps(self) -> int:
+        return 192
 
     def transcribe(self, file_path: str) -> str:
         raise NotImplementedError(

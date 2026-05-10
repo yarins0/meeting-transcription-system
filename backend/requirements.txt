@@ -4,5 +4,4 @@ python-multipart
 python-dotenv
 openai
 anthropic
-pydub
 python-docx

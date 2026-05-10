@@ -57,15 +57,16 @@ Event schema:
 ## Phase Status
 - [x] Phase 1 — Skeleton & Plumbing (FastAPI + Vite scaffold, /health, proxy)
 - [x] Phase 1.5 — Provider interface + SSE streaming architecture
-- [ ] Phase 2 — FileUploadUI component + frontend SSE reader + ErrorBoundary
-- [ ] Phase 3 — /summarize endpoint + Claude integration + ResultsView
+- [x] Phase 2 — FileUploadUI component + frontend SSE reader + ErrorBoundary
+- [x] Phase 3 — /summarize endpoint + Claude integration + ResultsView
 - [ ] Phase 4 — /export endpoint + python-docx Word download
 - [ ] Phase 5 — Hardening, edge cases, PROCESS.md, submission polish
 
 ## File Map
 ```
 backend/
-  main.py                    # FastAPI app — /health, /transcribe (SSE)
+  main.py                    # FastAPI app — /health, /provider-info, /transcribe (SSE), /summarize
+  summarization.py           # SummaryService + Pydantic models (ActionItem, SummaryResponse)
   requirements.txt
   .env.example
   transcription/
@@ -77,8 +78,15 @@ backend/
 frontend/
   src/
     main.tsx
-    App.tsx                  # stub — replace in Phase 2
+    App.tsx                  # orchestrates FileUploadUI → ResultsView flow
     vite-env.d.ts
+    hooks/
+      useTranscription.ts    # SSE stream reader hook
+      useSummarization.ts    # POST /api/summarize hook
+    components/
+      FileUploadUI.tsx       # drag-and-drop + 4-state upload UI
+      ResultsView.tsx        # renders all 5 summary sections
+      ErrorBoundary.tsx      # React class error boundary
   vite.config.ts             # proxy /api → localhost:8001
   package.json
   index.html

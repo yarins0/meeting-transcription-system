@@ -2,8 +2,9 @@ import openai
 
 from .base import TranscriptionProvider
 
-# Whisper API enforces a 25 MB request limit; compress anything above 24 MB to stay safe.
-_WHISPER_COMPRESSION_THRESHOLD = 24 * 1024 * 1024
+_UPLOAD_LIMIT   = 25 * 1024 * 1024  # Whisper API hard cap
+_COMPRESS_THRESHOLD = 24 * 1024 * 1024  # trigger compression 1 MB below the hard cap
+_COMPRESS_TARGET    = 20 * 1024 * 1024  # aim for this after compression (headroom for encoder variance)
 
 
 class WhisperApiProvider(TranscriptionProvider):
@@ -30,7 +31,23 @@ class WhisperApiProvider(TranscriptionProvider):
 
     @property
     def compression_threshold_bytes(self) -> int:
-        return _WHISPER_COMPRESSION_THRESHOLD
+        return _COMPRESS_THRESHOLD
+
+    @property
+    def upload_size_limit_bytes(self) -> int:
+        return _UPLOAD_LIMIT
+
+    @property
+    def compression_target_bytes(self) -> int:
+        return _COMPRESS_TARGET
+
+    @property
+    def min_compression_bitrate_kbps(self) -> int:
+        return 16  # floor for intelligible speech
+
+    @property
+    def max_compression_bitrate_kbps(self) -> int:
+        return 128  # no benefit beyond this for mono 16 kHz speech
 
     def transcribe(self, file_path: str) -> str:
         with open(file_path, "rb") as audio_file:

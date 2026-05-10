@@ -27,10 +27,32 @@ class TranscriptionProvider(ABC):
     @property
     @abstractmethod
     def compression_threshold_bytes(self) -> int:
-        """
-        Files larger than this will be compressed to mp3 before being sent to
-        the provider. Set to a very large value to effectively disable compression.
-        """
+        """Files larger than this will be compressed before being sent to the provider."""
+        ...
+
+    @property
+    @abstractmethod
+    def upload_size_limit_bytes(self) -> int:
+        """Hard maximum the provider will accept per request."""
+        ...
+
+    @property
+    @abstractmethod
+    def compression_target_bytes(self) -> int:
+        """Target output size when compressing — should include headroom below upload_size_limit_bytes
+        to account for mp3 encoder variance (~5–8% over the nominal bitrate target)."""
+        ...
+
+    @property
+    @abstractmethod
+    def min_compression_bitrate_kbps(self) -> int:
+        """Lowest acceptable audio bitrate; below this speech quality degrades too much."""
+        ...
+
+    @property
+    @abstractmethod
+    def max_compression_bitrate_kbps(self) -> int:
+        """Highest useful bitrate — no perceptible benefit beyond this for mono speech."""
         ...
 
     @abstractmethod
