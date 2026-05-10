@@ -22,7 +22,7 @@ structured to be deploy-ready without extra refactoring.
 
 ## Stack
 
-FastAPI (Python) + React (Vite) + OpenAI Whisper API + Anthropic Claude API (`claude-sonnet-4-20250514`)
+FastAPI (Python) + React (Vite) + OpenAI Whisper API + Anthropic Claude API (`claude-sonnet-4-6`)
 
 React handles UI and file upload. FastAPI exposes three endpoints: transcribe, summarize, export.
 All secrets via `.env`. CORS configured for localhost in dev; env-switchable for production.
@@ -82,17 +82,17 @@ sections. Verb-led action items enforce actionability without extra logic.
 
 ## Implementation Phases
 
-### Phase 1 — Skeleton & Plumbing (45 min)
+### Phase 1 — Skeleton & Plumbing (45 min) ✅
 **Goal**: Frontend and backend running locally, talking to each other. No real functionality yet.
 **Tasks**:
-- [ ] Vite + React scaffold; install axios, react-dropzone
-- [ ] FastAPI app with CORS enabled for localhost:5173
-- [ ] `/health` endpoint returning `{"status": "ok"}`
-- [ ] `.env.example` with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` placeholders
-- [ ] Vite proxy config pointing `/api` to `localhost:8000`
-- [ ] README.md stub with run instructions
+- [x] Vite + React scaffold; install axios, react-dropzone
+- [x] FastAPI app with CORS enabled for localhost:5173
+- [x] `/health` endpoint returning `{"status": "ok"}`
+- [x] `.env.example` with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` placeholders
+- [x] Vite proxy config pointing `/api` to `localhost:8001`
+- [x] README.md stub with run instructions
 
-**Exit criteria**: `curl http://localhost:8000/health` returns ok; React app loads in browser.
+**Exit criteria**: `curl http://localhost:8001/health` returns ok; React app loads in browser.
 
 ---
 
@@ -144,20 +144,21 @@ sections. Verb-led action items enforce actionability without extra logic.
 **Goal**: Confirm all supported formats work before submission.
 **Approach** (cheap — don't waste full Whisper tokens):
 - [ ] Upload a `.wav`, `.m4a`, `.mp4`, `.webm` file each — verify they reach Whisper without format/compression errors
-- [ ] Trigger the split path with a >3.5hr recording (or by temporarily lowering `compression_threshold_bytes`) — verify N-segment progress messages appear and parts join correctly
+- [x] Trigger the split path by temporarily lowering `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET` — confirmed "Transcribing part N of M…" messages appear and transcript joins correctly
 - [ ] Only run full transcription on 1–2 representative formats to validate transcript quality
 
 ---
 
-### Phase 5 — Hardening & Submission (55 min)
+### Phase 5 — Hardening & Submission (55 min) ✅
 **Goal**: No crashes on bad input. Submission artifacts complete.
 **Tasks**:
-- [ ] Handle edge cases: empty transcript, Claude returning malformed JSON, API timeout (120s)
-- [ ] File size indicator in upload UI ("Max ~24MB after compression")
-- [ ] Environment config is deploy-ready (no hardcoded localhost URLs)
+- [x] Handle edge cases: empty transcript, Claude returning malformed JSON, API timeout (120s)
+- [x] File size indicator in upload UI ("Over 24 MB? Auto-compressed · 500 MB max")
+- [x] Environment config is deploy-ready (no hardcoded localhost URLs, env-switchable CORS)
 - [ ] PROCESS.md: planning approach, AI usage examples with actual prompts, blockers encountered, time log
-- [ ] README.md: complete local run instructions (clone → install → add env vars → run)
-- [ ] Final check: all 5 required output sections present and correct
+- [x] README.md: complete local run instructions (clone → install → add env vars → run)
+- [x] Final check: all 5 required output sections present and correct
+- [x] pytest suite: 44 tests covering summarization parsing, docx export and RTL, FastAPI endpoints, compression pipeline
 
 **Exit criteria**: A stranger can clone the repo and run it in under 5 minutes. All assignment deliverables present.
 
@@ -167,9 +168,9 @@ sections. Verb-led action items enforce actionability without extra logic.
 
 These are not design decisions — they are things to measure and validate while building:
 
-- **Does Whisper accept pydub-compressed files?** Validate in Phase 2 with a real file. If not, try converting to mp3 at lower bitrate instead of compressing the original format.
-- **What's the actual latency for a 30-min recording?** Measure in Phase 2. If > 60s, add a more informative progress message.
-- **Does python-docx RTL work without extra configuration?** Test in Phase 4 with Hebrew text. If not, add explicit paragraph direction or note as a known limitation in PROCESS.md.
+- **Does Whisper accept pydub-compressed files?** ✅ Resolved — switched to direct ffmpeg compression (not pydub). Adaptive bitrate targets `compression_target_bytes`; validated with 83 MB mp3 file.
+- **What's the actual latency for a 30-min recording?** ✅ Resolved — SSE streaming keeps the UI responsive throughout; progress messages shown at each stage. Timeouts set to 120s for both Whisper and Claude.
+- **Does python-docx RTL work without extra configuration?** ✅ Resolved — requires explicit `w:bidi` on paragraphs and `w:bidiVisual` on tables. Implemented and validated with Hebrew .wav meeting.
 
 ---
 

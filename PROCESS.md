@@ -93,4 +93,27 @@ While claude builds, i tested for .wav file with an hebrew meeting which got bac
 The response was full on the next time (didnt display right to left on the web so fixed with anoter agent that also added sessionStorage use).
 
 After checking the .docx file for the hbrew .wav meeting:
-- Prompt: the docx file is missing the transcript section + the table content doesnt turn right to left when needed    
+- Prompt: the docx file is missing the transcript section + the table content doesnt turn right to left when needed
+
+After those fixes the full export flow worked correctly for Hebrew .wav — all 5 sections in the .docx, table columns RTL, paragraph text RTL, transcript included.
+
+- Prompt: /handoff
+
+## Phase 5 of PLAN (Hardening & Tests)
+
+Pasted the handoff prompt in plan mode. Plan covered: fix the local_whisper fallback error message, write the pytest suite, test the split path live, and commit everything.
+
+Fixed `local_whisper.py` — changed the `NotImplementedError` (which had dev-facing setup instructions leaking into the UI) to a clean `RuntimeError`: "Local Whisper model is not configured on this server."
+
+Claude wrote 44 tests across 4 files in `backend/tests/`:
+- `test_summarization.py` — empty transcript guard, markdown fence stripping, malformed JSON, wrong Pydantic schema, happy path
+- `test_export.py` — all sections present, RTL bidi on Hebrew/Arabic/Persian/Urdu paragraphs and table, null due date, empty collections fallback text
+- `test_endpoints.py` — /health, /summarize with mocked Claude, /export with mocked build_docx, Pydantic validation errors
+- `test_compression.py` — _target_bitrate clamping to min/max, below-threshold passthrough, single-segment and multi-segment splitting with start offset verification
+
+All 44 tests pass in ~2.5s.
+
+Tested the split path live: lowered `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET` in `whisper_api.py` to force splitting — confirmed "Transcribing part 1 of N…" SSE progress messages appeared in the UI and the final joined transcript was correct.
+
+- Prompt: update plan.md and the other docs
+- Prompt: yes (commit and push)    

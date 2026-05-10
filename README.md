@@ -56,6 +56,17 @@ curl http://localhost:8001/provider-info
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Running Tests
+
+The backend has a pytest suite (44 tests, ~3s):
+
+```bash
+cd backend
+python -m pytest tests/ -v
+```
+
+Covers: summarization parsing (empty input, markdown fence stripping, malformed JSON, wrong schema), docx export sections and RTL, FastAPI endpoints (`/health`, `/summarize`, `/export`), and compression pipeline logic (mocked ffmpeg).
+
 ## Running with Docker (backend only)
 
 ```bash
@@ -90,4 +101,4 @@ FFmpeg is baked into the image — no PATH configuration needed.
 - [x] Phase 2 — FileUploadUI (drag-and-drop), SSE progress reader, ErrorBoundary, retry flow
 - [x] Phase 3 — /summarize endpoint + Claude integration + ResultsView
 - [x] Phase 4 — /export endpoint + Word download (RTL support for Hebrew)
-- [ ] Phase 5 — Hardening, edge cases, PROCESS.md, submission polish
+- [x] Phase 5 — Hardening, edge cases, pytest suite (44 tests); PROCESS.md in progress
