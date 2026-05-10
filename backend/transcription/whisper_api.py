@@ -28,7 +28,7 @@ class WhisperApiProvider(TranscriptionProvider):
     def allowed_extensions(self) -> frozenset[str]:
         # Full list from https://platform.openai.com/docs/guides/speech-to-text
         return frozenset({".mp3", ".mp4", ".mpeg", ".mpga", ".m4a", ".wav", ".webm"})
-
+    
     @property
     def compression_threshold_bytes(self) -> int:
         return _COMPRESS_THRESHOLD

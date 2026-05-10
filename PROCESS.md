@@ -103,7 +103,6 @@ After those fixes the full export flow worked correctly for Hebrew .wav — all 
 
 Pasted the handoff prompt in plan mode. Plan covered: fix the local_whisper fallback error message, write the pytest suite, test the split path live, and commit everything.
 
-Fixed `local_whisper.py` — changed the `NotImplementedError` (which had dev-facing setup instructions leaking into the UI) to a clean `RuntimeError`: "Local Whisper model is not configured on this server."
 
 Claude wrote 44 tests across 4 files in `backend/tests/`:
 - `test_summarization.py` — empty transcript guard, markdown fence stripping, malformed JSON, wrong Pydantic schema, happy path
@@ -116,4 +115,4 @@ All 44 tests pass in ~2.5s.
 Tested the split path live: lowered `_COMPRESS_THRESHOLD` and `_COMPRESS_TARGET` in `whisper_api.py` to force splitting — confirmed "Transcribing part 1 of N…" SSE progress messages appeared in the UI and the final joined transcript was correct.
 
 - Prompt: update plan.md and the other docs
-- Prompt: yes (commit and push)    
+- Prompt: @PLAN.md [x] Environment config is deploy-ready (no hardcoded localhost URLs env-switchable CORS)- is this right? (i knew it wasnt when i wrote the prompt)
