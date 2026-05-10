@@ -21,9 +21,11 @@ from transcription import TranscriptionProvider, get_provider
 
 app = FastAPI(title="Meeting Transcription API")
 
+_CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

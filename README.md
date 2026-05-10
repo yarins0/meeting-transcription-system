@@ -86,6 +86,7 @@ FFmpeg is baked into the image — no PATH configuration needed.
 | `TRANSCRIPTION_PROVIDER` | No | `whisper_api` (default) or `local_whisper` |
 | `FALLBACK_TRANSCRIPTION_PROVIDER` | No | Provider to retry with on failure (e.g. `local_whisper`) |
 | `FFMPEG_BIN` | No | Full path to FFmpeg `bin/` directory — use when ffmpeg is not on PATH |
+| `CORS_ORIGINS` | No | Comma-separated allowed origins (default: `http://localhost:5173`) — set to your domain in production |
 
 ## Stack
 
