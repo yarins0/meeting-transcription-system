@@ -124,21 +124,10 @@ function App(): JSX.Element {
         <ErrorBoundary>
           {transcript !== null ? (
             <ResultsView transcript={transcript} onReset={handleReset} />
-          ) : providerInfo === null ? (
-            <div style={{
-              padding: '4rem 0',
-              textAlign: 'center',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.7rem',
-              letterSpacing: '0.12em',
-              color: 'var(--text-secondary)',
-            }}>
-              INITIALIZING<span style={{ animation: 'blink-cursor 1s step-end infinite' }}>_</span>
-            </div>
           ) : (
             <FileUploadUI
-              allowedExtensions={providerInfo.allowed_extensions}
-              fallbackProviderKey={providerInfo.fallback_provider_key ?? undefined}
+              allowedExtensions={providerInfo?.allowed_extensions ?? FALLBACK_EXTENSIONS}
+              fallbackProviderKey={providerInfo?.fallback_provider_key ?? undefined}
               onTranscriptReady={handleTranscriptReady}
             />
           )}
