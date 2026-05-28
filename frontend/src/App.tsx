@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FileUploadUI } from './components/FileUploadUI'
 import { ResultsView } from './components/ResultsView'
@@ -46,6 +47,13 @@ function App(): JSX.Element {
   }
 
   return (
+    <>
+    <Analytics
+      beforeSend={(event) => {
+        if (localStorage.getItem('va_exclude') === 'true') return null
+        return event
+      }}
+    />
     <div style={{
       minHeight: '100vh',
       display: 'flex',
@@ -137,6 +145,7 @@ function App(): JSX.Element {
         </ErrorBoundary>
       </div>
     </div>
+    </>
   )
 }
 
